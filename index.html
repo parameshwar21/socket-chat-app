@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat with Usernames & Time</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+      body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+      input, button { padding: 8px; margin: 5px; }
+      ul { list-style: none; padding: 0; width: 400px; margin: 20px auto; text-align: left; }
+      li { background: #f1f1f1; margin-bottom: 5px; padding: 8px; border-radius: 5px; }
+      .system { color: gray; font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <h2>💬 Chat with Username & Time</h2>
+
+    <input id="username" placeholder="Enter your name" />
+    <input id="room" placeholder="Room name (e.g. group1)" />
+    <button onclick="joinRoom()">Join Room</button>
+    <button onclick="leaveRoom()">Leave Room</button>
+
+    <br><br>
+
+    <input id="msg" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <ul id="messages"></ul>
+
+    <script>
+      const socket = io();
+      let currentRoom = "";
+      let username = "";
+
+      // Function to get time in HH:MM AM/PM
+      function getTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+
+      function joinRoom() {
+        username = document.getElementById("username").value.trim();
+        const roomName = document.getElementById("room").value.trim();
+        if (username && roomName) {
+          socket.emit("joinRoom", { username, roomName });
+          currentRoom = roomName;
+        }
+      }
+
+      function leaveRoom() {
+        if (currentRoom) {
+          socket.emit("leaveRoom", currentRoom);
+          currentRoom = "";
+        }
+      }
+
+      function sendMessage() {
+        const msg = document.getElementById("msg").value.trim();
+        if (msg && currentRoom) {
+          const time = getTime();
+          socket.emit("roomMessage", { roomName: currentRoom, msg, time });
+          document.getElementById("msg").value = "";
+        }
+      }
+
+      socket.on("message", (msg) => {
+        const li = document.createElement("li");
+        if (msg.includes("joined") || msg.includes("left")) li.classList.add("system");
+        li.textContent = msg;
+        document.getElementById("messages").appendChild(li);
+      });
+    </script>
+  </body>
+</html>
