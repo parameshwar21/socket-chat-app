@@ -4,7 +4,7 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-app.use(cors()); 
+app.use(cors()); // Allow frontend connections
 
 const server = http.createServer(app);
 const io = new Server(server, {
