@@ -18,6 +18,11 @@ app.get("/", (req, res) => {
   res.send("✅ WebSocket Server is running!");
 });
 
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
