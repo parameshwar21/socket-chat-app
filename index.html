@@ -6,11 +6,33 @@
     <title>Chat with Usernames & Time</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
-      body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-      input, button { padding: 8px; margin: 5px; }
-      ul { list-style: none; padding: 0; width: 400px; margin: 20px auto; text-align: left; }
-      li { background: #f1f1f1; margin-bottom: 5px; padding: 8px; border-radius: 5px; }
-      .system { color: gray; font-style: italic; }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+        background: #fafafa;
+      }
+      input, button {
+        padding: 8px;
+        margin: 5px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        width: 400px;
+        margin: 20px auto;
+        text-align: left;
+      }
+      li {
+        background: #f1f1f1;
+        margin-bottom: 5px;
+        padding: 8px;
+        border-radius: 5px;
+      }
+      .system {
+        color: gray;
+        font-style: italic;
+      }
     </style>
   </head>
   <body>
@@ -29,11 +51,11 @@
     <ul id="messages"></ul>
 
     <script>
-      const socket = io();
+      const socket = io("https://simple-chat-app-2tsv.onrender.com"); 
+
       let currentRoom = "";
       let username = "";
 
-      // Function to get time in HH:MM AM/PM
       function getTime() {
         const now = new Date();
         return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -45,12 +67,16 @@
         if (username && roomName) {
           socket.emit("joinRoom", { username, roomName });
           currentRoom = roomName;
+          addSystemMessage(`You joined ${roomName}`);
+        } else {
+          alert("Please enter both username and room name");
         }
       }
 
       function leaveRoom() {
         if (currentRoom) {
           socket.emit("leaveRoom", currentRoom);
+          addSystemMessage(`You left ${currentRoom}`);
           currentRoom = "";
         }
       }
@@ -70,6 +96,13 @@
         li.textContent = msg;
         document.getElementById("messages").appendChild(li);
       });
+
+      function addSystemMessage(text) {
+        const li = document.createElement("li");
+        li.classList.add("system");
+        li.textContent = text;
+        document.getElementById("messages").appendChild(li);
+      }
     </script>
   </body>
 </html>
