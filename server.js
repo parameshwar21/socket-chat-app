@@ -1,27 +1,15 @@
 const express = require("express");
 const http = require("http");
+const path = require("path");
 const { Server } = require("socket.io");
-const cors = require("cors");
 
 const app = express();
-app.use(cors()); // Allow frontend connections
-
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", 
-    methods: ["GET", "POST"]
-  }
-});
+const io = new Server(server);
 
 app.get("/", (req, res) => {
-  res.send("✅ WebSocket Server is running!");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
-
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -48,5 +36,6 @@ io.on("connection", (socket) => {
   });
 });
 
+// Port setup
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
